@@ -86,7 +86,6 @@ namespace
     return rcode;
   }
 
-
   py::object
   wrap_node_nd(const py::object &xadj_py, const py::object &adjncy_py)
   {
@@ -124,7 +123,8 @@ namespace
       const py::object &vwgt_py,
       const py::object &adjwgt_py,
       bool recursive,
-      bool contiguous)
+      bool contiguous,
+      int seed)
   {
     idx_t nvtxs = py::len(xadj_py) - 1;
     vector<idx_t> xadj, adjncy, vwgt, adjwgt;
@@ -155,6 +155,10 @@ namespace
     if (contiguous)
         options[METIS_OPTION_CONTIG] = 1;
 
+    if (seed>0){
+        options[METIS_OPTION_SEED] = seed;
+    }
+
     idx_t edgecut;
     std::unique_ptr<idx_t []> part(new idx_t[nvtxs]);
 
@@ -181,6 +185,7 @@ namespace
 
     return py::make_tuple(edgecut, part_py);
   }
+
 }
 
 PYBIND11_MODULE(_internal, m)
